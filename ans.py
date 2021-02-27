@@ -3,15 +3,23 @@ import sys
 import so_detection
 from os import path, remove
 
-def ping_scan():	
+def ping_scan(target):	
    nmap = nmap3.NmapHostDiscovery()
-   host_info = nmap.nmap_no_portscan("192.168.20.*")
+   host_info = nmap.nmap_no_portscan(target)
    host_up = host_info.keys()
-   if path.exists("Subred '{}'.txt".format("192.168.20.*")):
-   		remove("Subred '{}'.txt".format("192.168.20.*"))
+
+
+   if path.exists("Subred '{}'.txt".format(target)):
+   		remove("Subred '{}'.txt".format(target))
    else:
    		pass
-   		
+
+   if path.exists("IPs_up_'{}'.txt".format(target)):
+   		remove("IPs_up_{}.txt".format(target))
+   else:
+   		pass
+
+
    print("MOSTRANDO HOST ACTIVOS\n")
    #Recorriendo llaves del diccionario generado - las llaves con las IP que se encuentran activas
    for i in host_up:
@@ -20,10 +28,13 @@ def ping_scan():
    			pass
    		else:
 
-   			salida = open("Subred '{}'.txt".format("192.168.20.*"),'a')
+   			salida = open("Subred '{}'.txt".format(target),'a')
+   			#Archivo en el que almcenaremos unicamente las ip - para un uso posterior
+   			list_ip = open("IPs_up_{}.txt".format(target),'a')
    			print("---"*10)
    			#imprimimos la ip
    			print("Host: {}".format(i))
+   			list_ip.write(i+"\n")
    			salida.write("IP: "+i+"\n")
    			#Asignamod el diccionario que contiene la llave IP
    			datos_host = host_info[i]
@@ -52,12 +63,36 @@ def ping_scan():
    				print("NO SE ENCONTRARON DATOS\n")
    				salida.write("NO SE ENCONTRARON DATOS\n")
    			salida.close()
+   			list_ip.close()
+
+def os_list(ip_list):
+	nmap = nmap3.Nmap()
+	if path.exists(ip_list):
+		ips = open(ip_list,'r')
+		ips_r = ips.read().split('\n')
+		for ip in ips_r:
+			print("---"*10)
+			print("Sistema operativo para la ip: {}".format(ip))
+			os = nmap.nmap_os_detection(ip)
+			dic_os = os[ip]
+			name_os = dic_os['osmatch']
+
+			for i in name_os:
+				name_os = i['name']
+				print(name_os)
+		ips.close()
+	else:
+		print("Seleccione un archivo con el listado de IPs")
 
 
 def main():
 	print("Automatizador de nmap")
+	#target = input("Ingrese Rango de ip: ejemplo 192.168.1.*\n")
 	#so_detection.so()
-	ping_scan()
+	#ping_scan(target)
+
+	ip_list = input("Ingrese nombre de archivo con lista de IPs")
+	os_list(ip_list)
 
 
 if __name__ == '__main__':
