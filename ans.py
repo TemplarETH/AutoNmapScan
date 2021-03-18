@@ -65,24 +65,7 @@ def ping_scan(target):
    			salida.close()
    			list_ip.close()
 
-def os_list(ip_list):
-	nmap = nmap3.Nmap()
-	if path.exists(ip_list):
-		ips = open(ip_list,'r')
-		ips_r = ips.read().split('\n')
-		for ip in ips_r:
-			print("---"*10)
-			print("Sistema operativo para la ip: {}".format(ip))
-			os = nmap.nmap_os_detection(ip)
-			dic_os = os[ip]
-			name_os = dic_os['osmatch']
 
-			for i in name_os:
-				name_os = i['name']
-				print(name_os)
-		ips.close()
-	else:
-		print("Seleccione un archivo con el listado de IPs")
 
 
 def main():
@@ -92,7 +75,7 @@ def main():
 	#ping_scan(target)
 
 	ip_list = input("Ingrese nombre de archivo con lista de IPs")
-	os_list(ip_list)
+	so_detection.os_list(ip_list)
 
 
 if __name__ == '__main__':
